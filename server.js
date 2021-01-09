@@ -1,5 +1,9 @@
 /* eslint-disable no-undef */
 const app = require('./app');
+const connectDB = require('./config/db');
+
+// connect database
+connectDB()
 
 // Port Normalization
 const normalizePort = (val) => {
