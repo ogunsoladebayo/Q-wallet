@@ -5,8 +5,8 @@ const colors = require('colors');
 const cors = require('cors');
 const helmet = require('helmet');
 
-// import routes here
-// const auth = require('./routes/auth');
+// Route files
+const auth = require('./routes/auth');
 
 dotenv.config();
 const app = express();
@@ -29,8 +29,8 @@ app.use(
 	})
 );
 
-// mount routers here
-// app.use('/v1/auth', auth);
+// Mount routers
+app.use('/v1/auth', auth);
 
 // middlewares
 // app.use(errorHandler);
