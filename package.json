@@ -1,0 +1,37 @@
+{
+  "name": "q-wallet",
+  "version": "1.0.0",
+  "description": "flexible wallet system with international compatibility",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "NODE_ENV=production node server.js",
+    "test": "mocha --reporter mocha-badge-generator",
+    "lint": "eslint Models/* Utils/* Routes/* Controllers/* server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogunsoladebayo/Q-wallet.git"
+  },
+  "author": "Ogunsola Usman A.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ogunsoladebayo/Q-wallet/issues"
+  },
+  "homepage": "https://github.com/ogunsoladebayo/Q-wallet#readme",
+  "devDependencies": {
+    "eslint": "^7.17.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^4.3.1",
+    "mocha-badge-generator": "^0.9.0",
+    "mongoose": "^5.11.11"
+  }
+}
