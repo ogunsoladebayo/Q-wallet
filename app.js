@@ -29,14 +29,6 @@ app.use(
 	})
 );
 
-const Wallet = require('./models/Wallet');
-app.get('/', async(req,res)=>{
-    const wallet = await Wallet.create({
-        currency: "NGN"
-    })
-    res.json({wallet})
-})
-
 // mount routers here
 // app.use('/v1/auth', auth);
 

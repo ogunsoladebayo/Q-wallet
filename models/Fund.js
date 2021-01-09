@@ -10,11 +10,11 @@ const FundSchema = new mongoose.Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'Wallet',
 		required: true,
-    },
-    currency: {
-        type: String,
-        required: true
-    },
+	},
+	currency: {
+		type: String,
+		required: true,
+	},
 	amount: {
 		type: Number,
 		required: true,

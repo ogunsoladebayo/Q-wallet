@@ -19,11 +19,11 @@ const UserSchema = new mongoose.Schema({
 		enum: ['noob', 'elite', 'admin'],
 		default: 'noob',
 	},
-    wallet: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Wallet',
-        required: true
-    },
+	wallet: {
+		type: mongoose.Schema.ObjectId,
+		ref: 'Wallet',
+		required: true,
+	},
 	password: {
 		type: String,
 		required: [true, 'Please add a password'],

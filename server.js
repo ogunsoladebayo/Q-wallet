@@ -3,7 +3,7 @@ const app = require('./app');
 const connectDB = require('./config/db');
 
 // connect database
-connectDB()
+connectDB();
 
 // Port Normalization
 const normalizePort = (val) => {
