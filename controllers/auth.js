@@ -1,3 +1,4 @@
+const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const sendEmail = require('../utils/sendEmail');
 const User = require('../models/User');
@@ -72,7 +73,10 @@ exports.login = asyncHandler(async (req, res, next) => {
 	if (!isMatch) {
 		return next(new ErrorResponse('Invalid credentials', 401));
 	}
-
+	// check if email is confirmed
+	if (!user.isEmailConfirmed) {
+		return next(new ErrorResponse('Email not confirmed', 401));
+	}
 	sendTokenResponse(user, 200, res);
 });
 
