@@ -5,6 +5,28 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+	// Create token
+	const token = user.getSignedJwtToken();
+
+	const options = {
+		expires: new Date(
+			Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+		),
+		httpOnly: true,
+	};
+
+	if (process.env.NODE_ENV === 'production') {
+		options.secure = true;
+	}
+
+	res.status(statusCode).cookie('token', token, options).json({
+		success: true,
+		token,
+	});
+};
+
 // @desc      Register user
 // @route     POST /v1/auth/register
 // @access    Public
@@ -36,19 +58,28 @@ exports.register = asyncHandler(async (req, res, next) => {
 		'host'
 	)}/v1/auth/confirmemail?token=${confirmEmailToken}`;
 
-	const message = `You are receiving this email because you, or someone else has signed up an account on Q-wallet. Please confirm your email address by clicking the link below. \n ${confirmEmailURL}`;
+	const message = `You are receiving this email because you (or someone else) has signed up an account on Q-wallet. Please confirm your email address by clicking the link below. \n ${confirmEmailURL}`;
+	try {
+		const sendResult = await sendEmail({
+			email: user.email,
+			subject: 'Confirm Your Email',
+			message,
+		});
 
-	const sendResult = await sendEmail({
-		email: user.email,
-		subject: 'Email confirmation token',
-		message,
-	});
-
-	user.save({ validateBeforeSave: false });
-	res.status(200).json({
-		success: true,
-		message: `confirmation email sent to ${user.email}`,
-	});
+		user.save({ validateBeforeSave: false });
+		res.status(200).json({
+			success: true,
+			message: `confirmation email sent to ${user.email}`,
+		});
+	} catch (error) {
+		user.deleteOne();
+		wallet.deleteOne();
+		return next(
+			new ErrorResponse(
+				'Could not send confirmation email, please register again'
+			)
+		);
+	}
 });
 
 // @desc    Confirm Email
@@ -122,28 +153,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 	sendTokenResponse(user, 200, res);
 });
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-	// Create token
-	const token = user.getSignedJwtToken();
-
-	const options = {
-		expires: new Date(
-			Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-		),
-		httpOnly: true,
-	};
-
-	if (process.env.NODE_ENV === 'production') {
-		options.secure = true;
-	}
-
-	res.status(statusCode).cookie('token', token, options).json({
-		success: true,
-		token,
-	});
-};
-
 // @desc      Log user out / clear cookie
 // @route     GET /v1/auth/logout
 // @access    Public
@@ -157,4 +166,78 @@ exports.logout = asyncHandler(async (req, res, next) => {
 		success: true,
 		data: {},
 	});
+});
+
+// @desc      Forgot password
+// @route     POST /v1/auth/forgotpassword
+// @access    Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+	const user = await User.findOne({ email: req.body.email });
+
+	if (!user) {
+		y;
+		return next(new ErrorResponse('There is no user with that email', 404));
+	}
+
+	// Get reset token
+	const resetToken = user.getResetPasswordToken();
+
+	await user.save({ validateBeforeSave: false });
+
+	// Create reset url
+	const resetUrl = `${req.protocol}://${req.get(
+		'host'
+	)}/v1/auth/resetpassword?token=${resetToken}`;
+
+	const message = `You are receiving this email because you (or someone else) has requested the reset of your password. Please click this link to proceed: ${resetUrl} otherwise ignore`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: 'Password Reset',
+			message,
+		});
+
+		res.status(200).json({
+			success: true,
+			data: `Password reset email sent to ${user.email}`,
+		});
+	} catch (err) {
+		console.log(err);
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+
+		await user.save({ validateBeforeSave: false });
+
+		return next(new ErrorResponse('Email could not be sent', 500));
+	}
+});
+
+// @desc      Reset password
+// @route     PUT /v1/auth/resetpassword
+// @access    Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+	// Get hashed token
+	const { token } = req.query;
+	const resetPasswordToken = crypto
+		.createHash('sha256')
+		.update(token)
+		.digest('hex');
+
+	const user = await User.findOne({
+		resetPasswordToken,
+		resetPasswordExpire: { $gt: Date.now() },
+	});
+
+	if (!user) {
+		return next(new ErrorResponse('Invalid token', 400));
+	}
+
+	// Set new password
+	user.password = req.body.password;
+	user.resetPasswordToken = undefined;
+	user.resetPasswordExpire = undefined;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
 });

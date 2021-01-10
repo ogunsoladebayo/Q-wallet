@@ -24,5 +24,15 @@ const FundSchema = new mongoose.Schema({
 		required: true,
 		default: 'Not approved',
 	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+	},
+	modifiedAt: Date,
 });
+
+FundSchema.pre('save', () => {
+	this.modifiedAt = Date.now();
+});
+
 module.exports = mongoose.model('Fund', FundSchema);

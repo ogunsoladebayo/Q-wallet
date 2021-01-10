@@ -21,6 +21,15 @@ const WalletSchema = new mongoose.Schema({
 		required: true,
 		default: false,
 	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+	},
+	modifiedAt: Date,
+});
+
+WalletSchema.pre('save', () => {
+	this.modifiedAt = Date.now();
 });
 
 module.exports = mongoose.model('Wallet', WalletSchema);

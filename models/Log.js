@@ -21,6 +21,15 @@ const LogSchema = new mongoose.Schema({
 		ref: 'Wallet',
 		required: true,
 	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+	},
+	modifiedAt: Date,
+});
+
+LogSchema.pre('save', () => {
+	this.modifiedAt = Date.now();
 });
 
 module.exports = mongoose.model('Log', LogSchema);
