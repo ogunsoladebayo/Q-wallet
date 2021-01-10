@@ -1,6 +1,7 @@
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 
@@ -28,23 +29,64 @@ exports.register = asyncHandler(async (req, res, next) => {
 	user.wallet = wallet.id;
 
 	// grab token and send to email
-	// const confirmEmailToken = user.generateEmailConfirmToken();
+	const confirmEmailToken = user.generateEmailConfirmToken();
 
-	// // Create reset url
-	// const confirmEmailURL = `${req.protocol}://${req.get(
-	// 	'host'
-	// )}/api/v1/auth/confirmemail?token=${confirmEmailToken}`;
+	// Create reset url
+	const confirmEmailURL = `${req.protocol}://${req.get(
+		'host'
+	)}/v1/auth/confirmemail?token=${confirmEmailToken}`;
 
-	// const message = `You are receiving this email because you need to confirm your email address. Please make a GET request to: \n\n ${confirmEmailURL}`;
+	const message = `You are receiving this email because you, or someone else has signed up an account on Q-wallet. Please confirm your email address by clicking the link below. \n ${confirmEmailURL}`;
 
-	// const sendResult = await sendEmail({
-	//     email: user.email,
-	// 	subject: 'Email confirmation token',
-	// 	message,
-	// });
+	const sendResult = await sendEmail({
+		email: user.email,
+		subject: 'Email confirmation token',
+		message,
+	});
 
-	sendTokenResponse(user, 200, res);
 	user.save({ validateBeforeSave: false });
+	res.status(200).json({
+		success: true,
+		message: `confirmation email sent to ${user.email}`,
+	});
+});
+
+// @desc    Confirm Email
+// @route   GET /v1/auth/confirmemail
+// @access  Public
+exports.confirmEmail = asyncHandler(async (req, res, next) => {
+	// grab token from email
+	const { token } = req.query;
+
+	if (!token) {
+		return next(new ErrorResponse('Invalid Token', 400));
+	}
+
+	const splitToken = token.split('.')[0];
+	const confirmEmailToken = crypto
+		.createHash('sha256')
+		.update(splitToken)
+		.digest('hex');
+
+	// get user by token
+	const user = await User.findOne({
+		confirmEmailToken,
+		isEmailConfirmed: false,
+	});
+
+	if (!user) {
+		return next(new ErrorResponse('Invalid Token', 400));
+	}
+
+	// update confirmed to true
+	user.confirmEmailToken = undefined;
+	user.isEmailConfirmed = true;
+
+	// save
+	user.save({ validateBeforeSave: false });
+
+	// return token
+	sendTokenResponse(user, 200, res);
 });
 
 // @desc      Login user
@@ -103,7 +145,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 };
 
 // @desc      Log user out / clear cookie
-// @route     GET /api/v1/auth/logout
+// @route     GET /v1/auth/logout
 // @access    Public
 exports.logout = asyncHandler(async (req, res, next) => {
 	res.cookie('token', 'none', {
