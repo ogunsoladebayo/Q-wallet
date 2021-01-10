@@ -241,3 +241,90 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
 	sendTokenResponse(user, 200, res);
 });
+
+// @desc      Get current logged in user
+// @route     GET /v1/auth/me
+// @access    Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+	// user is already available in req due to the protect middleware
+	const user = req.user;
+	const other_wallets = req.otherWallets;
+	res.status(200).json({
+		success: true,
+		data: user,
+		other_wallets,
+	});
+});
+
+// @desc      Update user details
+// @route     PUT /v1/auth/updatedetails
+// @access    Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+	const fieldsToUpdate = {
+		name: req.body.name,
+		email: req.body.email,
+	};
+
+	const user = await User.findById(req.user.id);
+
+	if (req.body.name) {
+		user.name = req.body.name;
+	}
+
+	if (req.body.email) {
+		user.email = req.body.email;
+		user.isEmailConfirmed = false;
+		// grab token and send to email
+		const confirmEmailToken = user.generateEmailConfirmToken();
+
+		// Create reset url
+		const confirmEmailURL = `${req.protocol}://${req.get(
+			'host'
+		)}/v1/auth/confirmemail?token=${confirmEmailToken}`;
+
+		const message = `You are receiving this email because you (or someone else) has tried to change your account's email address on Q-wallet. Please confirm your email address by clicking the link below. \n ${confirmEmailURL}`;
+		try {
+			const sendResult = await sendEmail({
+				email: user.email,
+				subject: 'Confirm Your Email',
+				message,
+			});
+
+			res.status(200).json({
+				success: true,
+				message: `confirmation email sent to ${user.email}`,
+			});
+		} catch (error) {
+			user.deleteOne();
+			wallet.deleteOne();
+			return next(
+				new ErrorResponse(
+					'Could not send confirmation email, please try again'
+				)
+			);
+		}
+	}
+	user.save({ validateBeforeSave: false });
+
+	res.status(200).json({
+		success: true,
+		data: user,
+	});
+});
+
+// @desc      Update password
+// @route     PUT /v1/auth/updatepassword
+// @access    Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id).select('+password');
+
+	// Check current password
+	if (!(await user.matchPassword(req.body.currentPassword))) {
+		return next(new ErrorResponse('Password is incorrect', 401));
+	}
+
+	user.password = req.body.newPassword;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
+});
