@@ -181,3 +181,26 @@ exports.updateWallet = asyncHandler(async (req, res, next) => {
 		data: wallet,
 	});
 });
+
+// @desc      Delete wallet
+// @route     DELETE /v1/users/wallets/:id
+// @access    Private/Admin
+exports.deleteWallet = asyncHandler(async (req, res, next) => {
+	const wallet = await Wallet.findById(req.params.id);
+
+	// check wallet is not main before delete
+	if (wallet.isMain) {
+		return next(new ErrorResponse('Error! cannot delete main wallet'), 400);
+	}
+
+	// check wallet is empty before delete
+	if (wallet.balance > 0) {
+		return next(new ErrorResponse('Error! wallet not empty'), 400);
+	}
+	await wallet.delete();
+
+	res.status(200).json({
+		success: true,
+		data: {},
+	});
+});

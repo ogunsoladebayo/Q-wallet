@@ -5,6 +5,7 @@ const {
 	getWallets,
 	createWallet,
 	updateWallet,
+	deleteWallet,
 } = require('../controllers/users');
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router
 router
 	.route('/wallets/:id')
 	.get(protect, getWallet)
-	.put(protect, authorize('admin'), updateWallet);
+	.put(protect, authorize('admin'), updateWallet)
+	.delete(protect, authorize('admin'), deleteWallet);
 
 module.exports = router;
