@@ -30,19 +30,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 	try {
 		// Verify token
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
 		req.user = await User.findById(decoded.id);
-
-		// get user wallet details
-		req.user.wallet = await Wallet.findById(req.user.wallet);
-
-		// check if user is elite to send other wallet details
-		if (req.user.role == 'elite') {
-			req.otherWallets = await Wallet.find({
-				user: req.user.id,
-				isMain: false,
-			});
-		}
 		next();
 	} catch (err) {
 		return next(

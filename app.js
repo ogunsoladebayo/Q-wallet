@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser');
 
 // Route files
 const auth = require('./routes/auth');
+const users = require('./routes/users');
 
 // env
 dotenv.config();

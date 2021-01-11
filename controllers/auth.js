@@ -175,7 +175,6 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 	const user = await User.findOne({ email: req.body.email });
 
 	if (!user) {
-		y;
 		return next(new ErrorResponse('There is no user with that email', 404));
 	}
 
@@ -248,11 +247,28 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 exports.getMe = asyncHandler(async (req, res, next) => {
 	// user is already available in req due to the protect middleware
 	const user = req.user;
-	const other_wallets = req.otherWallets;
+	const mainWallet = await Wallet.findById(user.wallet);
+	const { name, email, role, _id, isEmailConfirmed } = user;
+	const data = {
+		name,
+		email,
+		role,
+		id: _id,
+		isEmailConfirmed,
+		mainWallet,
+	};
+	// get other wallets if user is elite
+	if (user.role === 'elite') {
+		const secondaryWallets = await Wallet.find({
+			user: user.id,
+			isMain: false,
+		});
+		data.secondaryWallets = secondaryWallets;
+	}
+
 	res.status(200).json({
 		success: true,
-		data: user,
-		other_wallets,
+		user: data,
 	});
 });
 
