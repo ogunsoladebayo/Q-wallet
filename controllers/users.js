@@ -73,3 +73,111 @@ exports.getWallets = asyncHandler(async (req, res, next) => {
 		other_wallets,
 	});
 });
+
+// @desc      Create wallet
+// @route     POST /v1/users/wallets
+// @access    Private/Admin
+exports.createWallet = asyncHandler(async (req, res, next) => {
+	// user id to associated to new wallet gotten from auth middleware
+	req.body.user = req.user.id;
+
+	// check if currency already exists
+	const currencyExists = await Wallet.findOne({
+		user: req.user.id,
+		currency: req.body.currency,
+	});
+
+	if (currencyExists) {
+		return next(
+			new ErrorResponse('Cannot have two wallets with same currency', 401)
+		);
+	}
+
+	const wallet = await Wallet.create(req.body);
+
+	res.status(201).json({
+		success: true,
+		data: wallet,
+	});
+});
+
+// @desc      Update wallet
+// @route     PUT /v1/users/wallets/byuserid/:id
+// @access    Admin
+exports.updateWallet = asyncHandler(async (req, res, next) => {
+	if (!req.body.currency) {
+		return next(new ErrorResponse('Please provide a currency', 400));
+	}
+	const { userid, walletid } = req.query;
+
+	// get wallet based on endpoint used
+	let wallet;
+	let currencyExists;
+
+	if (userid) {
+		wallet = await Wallet.findOne({
+			user: userid,
+			isMain: true,
+		});
+		// check if currency already exists
+		currencyExists = await Wallet.findOne({
+			user: userid,
+			currency: req.body.currency,
+		});
+	} else if (walletid) {
+		wallet = await Wallet.findById(walletid);
+		// check if currency already exists
+		currencyExists = await Wallet.findOne({
+			user: wallet.user,
+			currency: req.body.currency,
+		});
+	}
+
+	// if wallet not found
+	if (!wallet) {
+		return next(new ErrorResponse('Wallet not found', 404));
+	}
+
+	// get current currency and balance
+	const currentCurrency = wallet.currency;
+	const currentBalance = wallet.balance;
+
+	// new currency
+	const newCurrency = req.body.currency;
+
+	try {
+		// Convert current balance to new balance in new currency
+		const conversionString = `${currentCurrency}_${newCurrency}`;
+		await axios
+			.get(
+				`https://free.currconv.com/api/v7/convert?q=${conversionString}&compact=ultra&apiKey=${process.env.CURRCONV_API_KEY}`
+			)
+			.then((response) => {
+				data = JSON.stringify(response.data);
+				const rate = data.match(/[\d|,|.|e|E|\+]+/g)[0];
+
+				// Update wallet balance and currency to new, then save
+				wallet.currency = newCurrency;
+				wallet.balance = currentBalance * rate;
+				wallet.isMain = !!userid;
+				if (currencyExists && currencyExists.id != wallet.id) {
+					wallet.balance += currencyExists.balance;
+					wallet.id = currencyExists.id;
+					currencyExists.delete();
+				}
+				wallet.save({ validateBeforeSave: true });
+			});
+	} catch (error) {
+		return next(
+			new ErrorResponse(
+				'Unable to change currency, please try again',
+				500
+			)
+		);
+	}
+
+	res.status(200).json({
+		success: true,
+		data: wallet,
+	});
+});
