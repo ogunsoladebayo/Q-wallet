@@ -71,3 +71,62 @@ exports.fundWallet = asyncHandler(async (req, res, next) => {
 		});
 	}
 });
+
+exports.withdrawFromWallet = asyncHandler(async (req, res, next) => {
+	const { currency, amount } = req.body;
+	// if noob
+	if (req.user.role === 'noob') {
+		req.body.user = req.user.id;
+		// get the wallet
+		var wallet = await Wallet.findOne({
+			user: req.body.user,
+			isMain: true,
+		});
+		if (!wallet) {
+			return next(new ErrorResponse('No wallet found for user', 404));
+		}
+		// check if currency are not same
+		if (currency !== wallet.currency) {
+			// convert to wallet currency
+			newAmount = await converter(amount, currency, wallet.currency);
+			req.body.amount = newAmount;
+		}
+	}
+	// if elite
+	else if (req.user.role === 'elite') {
+		var wallet = await Wallet.findOne({
+			user: req.user.id,
+			currency: currency,
+		});
+		// check if wallet does not exists
+		if (!wallet) {
+			// get main wallet
+			wallet = await Wallet.findOne({
+				user: req.user.id,
+				isMain: true,
+			});
+			// convert amount to main wallet currency
+			newAmount = await converter(amount, currency, wallet.currency);
+			req.body.amount = newAmount;
+		}
+	}
+
+	// check that wallet balance is up to withdrawal amount
+	if (req.body.amount > wallet.balance) {
+		return next(
+			new ErrorResponse(
+				'Withdrawal amount exceed balance for this currency',
+				401
+			)
+		);
+	}
+
+	// withdraw and save
+	wallet.balance -= req.body.amount;
+	await wallet.save({ validateBeforeSave: true });
+	res.status(200).json({
+		success: true,
+		message: 'Withdrawal successful',
+		wallet,
+	});
+});
