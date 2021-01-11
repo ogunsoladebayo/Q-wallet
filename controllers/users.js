@@ -58,3 +58,18 @@ exports.getWallet = asyncHandler(async (req, res, next) => {
 		data: wallet,
 	});
 });
+
+// @desc      Get all user wallets
+// @route     GET /v1/users/wallets
+// @access    Elite
+exports.getWallets = asyncHandler(async (req, res, next) => {
+	const other_wallets = await Wallet.find({
+		user: req.user.id,
+		isMain: false,
+	});
+
+	res.status(200).json({
+		success: true,
+		other_wallets,
+	});
+});
