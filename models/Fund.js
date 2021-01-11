@@ -6,11 +6,6 @@ const FundSchema = new mongoose.Schema({
 		ref: 'User',
 		required: true,
 	},
-	wallet: {
-		type: mongoose.Schema.ObjectId,
-		ref: 'Wallet',
-		required: true,
-	},
 	currency: {
 		type: String,
 		required: true,

@@ -2,7 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Wallet = require('../models/Wallet');
 const User = require('../models/User');
-const axios = require('axios').default;
+const converter = require('../utils/converter');
 
 // @desc      Get a user
 // @route     GET /v1/users/:id
@@ -137,44 +137,29 @@ exports.updateWallet = asyncHandler(async (req, res, next) => {
 	if (!wallet) {
 		return next(new ErrorResponse('Wallet not found', 404));
 	}
+	// new currency for wallet
+	newCurrency = req.body.currency;
 
 	// get current currency and balance
-	const currentCurrency = wallet.currency;
+	const fromCurrency = wallet.currency;
 	const currentBalance = wallet.balance;
 
-	// new currency
-	const newCurrency = req.body.currency;
+	const newBalance = await converter(
+		currentBalance,
+		fromCurrency,
+		newCurrency
+	);
+	// Update wallet balance and currency to new, then save
+	wallet.currency = newCurrency;
+	wallet.balance = newBalance;
 
-	try {
-		// Convert current balance to new balance in new currency
-		const conversionString = `${currentCurrency}_${newCurrency}`;
-		await axios
-			.get(
-				`https://free.currconv.com/api/v7/convert?q=${conversionString}&compact=ultra&apiKey=${process.env.CURRCONV_API_KEY}`
-			)
-			.then((response) => {
-				data = JSON.stringify(response.data);
-				const rate = data.match(/[\d|,|.|e|E|\+]+/g)[0];
-
-				// Update wallet balance and currency to new, then save
-				wallet.currency = newCurrency;
-				wallet.balance = currentBalance * rate;
-				wallet.isMain = !!userid;
-				if (currencyExists && currencyExists.id != wallet.id) {
-					wallet.balance += currencyExists.balance;
-					wallet.id = currencyExists.id;
-					currencyExists.delete();
-				}
-				wallet.save({ validateBeforeSave: true });
-			});
-	} catch (error) {
-		return next(
-			new ErrorResponse(
-				'Unable to change currency, please try again',
-				500
-			)
-		);
+	wallet.isMain = !!userid;
+	if (currencyExists && currencyExists.id != wallet.id) {
+		wallet.balance += currencyExists.balance;
+		wallet.id = currencyExists.id;
+		currencyExists.delete();
 	}
+	wallet.save({ validateBeforeSave: true });
 
 	res.status(200).json({
 		success: true,
