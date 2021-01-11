@@ -58,6 +58,7 @@ app.use(
 
 // Mount routers
 app.use('/v1/auth', auth);
+app.use('/v1/users', users);
 
 // error handling middleware
 app.use(errorHandler);
