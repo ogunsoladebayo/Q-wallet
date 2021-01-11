@@ -37,3 +37,24 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 		user: data,
 	});
 });
+
+// @desc      Get single wallet
+// @route     GET /v1/users/wallets/:id
+// @access    Private/Admin
+exports.getWallet = asyncHandler(async (req, res, next) => {
+	const wallet = await Wallet.findById(req.params.id);
+	if (!req.params.id) {
+		return next(new ErrorResponse('Please enter a wallet id', 400));
+	}
+
+	if (wallet.user != req.user.id && req.user.role != 'admin') {
+		return next(
+			new ErrorResponse('Not authorized to view this wallet', 401)
+		);
+	}
+
+	res.status(200).json({
+		success: true,
+		data: wallet,
+	});
+});
