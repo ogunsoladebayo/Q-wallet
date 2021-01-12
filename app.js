@@ -15,6 +15,7 @@ const cookieParser = require('cookie-parser');
 const auth = require('./routes/auth');
 const users = require('./routes/users');
 const transactions = require('./routes/transactions');
+const admin = require('./routes/admin');
 
 // env
 dotenv.config();
@@ -61,6 +62,7 @@ app.use(
 app.use('/v1/auth', auth);
 app.use('/v1/users', users);
 app.use('/v1/transactions', transactions);
+app.use('/v1/admin', admin);
 
 // error handling middleware
 app.use(errorHandler);

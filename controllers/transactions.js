@@ -23,10 +23,15 @@ exports.fundWallet = asyncHandler(async (req, res, next) => {
 		// check if currency are not same
 		if (currency !== wallet.currency) {
 			// convert to wallet currency
-			newAmount = await converter(amount, currency, wallet.currency);
+			const newAmount = await converter(
+				amount,
+				currency,
+				wallet.currency
+			);
 			req.body.currency = wallet.currency;
 			req.body.amount = newAmount;
 		}
+		req.body.wallet = wallet.id;
 
 		// update fund schema instead of applying fund directly
 		const fund = await Fund.create(req.body);
@@ -91,7 +96,11 @@ exports.withdrawFromWallet = asyncHandler(async (req, res, next) => {
 		// check if currency are not same
 		if (currency !== wallet.currency) {
 			// convert to wallet currency
-			newAmount = await converter(amount, currency, wallet.currency);
+			const newAmount = await converter(
+				amount,
+				currency,
+				wallet.currency
+			);
 			req.body.amount = newAmount;
 		}
 	}
@@ -109,7 +118,11 @@ exports.withdrawFromWallet = asyncHandler(async (req, res, next) => {
 				isMain: true,
 			});
 			// convert amount to main wallet currency
-			newAmount = await converter(amount, currency, wallet.currency);
+			const newAmount = await converter(
+				amount,
+				currency,
+				wallet.currency
+			);
 			req.body.amount = newAmount;
 		}
 	}
