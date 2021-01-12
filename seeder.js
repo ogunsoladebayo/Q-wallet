@@ -26,7 +26,10 @@ const importData = async () => {
 			email: 'admin@q-wallet.com',
 			password: '01234dmin',
 		});
-		console.log('Admin user created...'.green.inverse);
+		console.log(
+			'Admin user created..., email: admin@q-wallet.com, password: 01234Admin'
+				.green.inverse
+		);
 		process.exit();
 	} catch (err) {
 		console.error(err);
