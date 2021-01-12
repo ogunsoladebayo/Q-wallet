@@ -4,9 +4,9 @@ const Wallet = require('../models/Wallet');
 const converter = require('../utils/converter');
 const ErrorResponse = require('../utils/errorResponse');
 
-//  @desc   Fund wallet for any user
-//  @route  /v1/transactions/funding
-//  @access Noob/Elite/Admin
+//  @desc   Fund wallet for noob/elite
+//  @route  /v1/transactions/fund
+//  @access Noob/Elite
 exports.fundWallet = asyncHandler(async (req, res, next) => {
 	const { currency, amount } = req.body;
 	// check if noob
@@ -72,6 +72,9 @@ exports.fundWallet = asyncHandler(async (req, res, next) => {
 	}
 });
 
+//  @desc   withdraw from wallet for noob/elite
+//  @route  /v1/transactions/withdraw
+//  @access Noob/Elite
 exports.withdrawFromWallet = asyncHandler(async (req, res, next) => {
 	const { currency, amount } = req.body;
 	// if noob
