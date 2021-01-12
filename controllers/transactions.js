@@ -38,7 +38,7 @@ exports.fundWallet = asyncHandler(async (req, res, next) => {
 
 		res.status(201).json({
 			success: true,
-			message: 'Funds recieved, awaiting approval',
+			message: 'Funds received, awaiting approval',
 			data: fund,
 		});
 	}

@@ -118,3 +118,62 @@ exports.approveFund = asyncHandler(async (req, res, next) => {
 		wallet,
 	});
 });
+
+//  @desc   Admin acess to get unapproved funds.
+//  @route  /v1/admin/pending
+//  @access Admin
+exports.getPending = asyncHandler(async (req, res, next) => {
+	const funds = await Fund.find({ approvedBy: 'Not approved' });
+	if (!funds) {
+		return next(new ErrorResponse('No pending funds currently', 404));
+	}
+	res.status(200).json({ funds });
+});
+
+//  @desc   Admin acess to upgrade a user.
+//  @route  /v1/admin/upgrade/:userid
+//  @access Admin
+exports.upgrade = asyncHandler(async (req, res, next) => {
+	if (!req.params.userid) {
+		return next(new ErrorResponse('pass in user id!', 400));
+	}
+	const user = await User.findByIdAndUpdate(req.params.userid, {
+		role: 'elite',
+	});
+	if (!user) {
+		return next(new ErrorResponse('user not found!', 404));
+	}
+	if (user.role === 'elite') {
+		return next(new ErrorResponse('user already elite', 400));
+	}
+	user.role = 'elite';
+	res.status(200).json({
+		success: true,
+		message: 'user upgraded successfully',
+		user,
+	});
+});
+
+//  @desc   Admin acess to upgrade a user.
+//  @route  /v1/admin/upgrade/:userid
+//  @access Admin
+exports.downgrade = asyncHandler(async (req, res, next) => {
+	if (!req.params.userid) {
+		return next(new ErrorResponse('pass in user id!', 400));
+	}
+	const user = await User.findByIdAndUpdate(req.params.userid, {
+		role: 'noob',
+	});
+	if (!user) {
+		return next(new ErrorResponse('user not found!', 404));
+	}
+	if (user.role === 'noob') {
+		return next(new ErrorResponse('user already noob', 400));
+	}
+	user.role = 'noob';
+	res.status(200).json({
+		success: true,
+		message: 'user downgraded successfully',
+		user,
+	});
+});
