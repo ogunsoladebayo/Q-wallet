@@ -32,8 +32,8 @@ const UserSchema = new mongoose.Schema({
 		required: [true, 'Please add a password'],
 		minlength: 8,
 		match: [
-			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*([^a-zA-Z\d\s])).{8,}$/,
-			'Password must be a minimum of 8 characters long and must have at least one uppercase and special character',
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/,
+			'Password must be a minimum of 8 characters long and must have at least one uppercase and a lower case.',
 		],
 		select: false,
 	},
@@ -57,7 +57,6 @@ const UserSchema = new mongoose.Schema({
 	modifiedAt: Date,
 });
 
-// TODO: Write regex for UserSchma.pre() to take in 'updateOne' and 'save' together
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function (next) {
 	this.modifiedAt = Date.now();
