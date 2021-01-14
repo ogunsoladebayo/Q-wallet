@@ -8,8 +8,17 @@ dotenv.config();
 // Load user model
 const User = require('./models/User');
 
+const {
+	MONGO_USERNAME,
+	MONGO_PASSWORD,
+	MONGO_HOSTNAME,
+	MONGO_PORT,
+	MONGO_DB,
+} = process.env;
+const url = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOSTNAME}:${MONGO_PORT}/${MONGO_DB}?authSource=admin`;
+
 // Connect to DB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(url, {
 	useNewUrlParser: true,
 	useCreateIndex: true,
 	useFindAndModify: false,
@@ -24,7 +33,7 @@ const importData = async () => {
 			role: 'admin',
 			isEmailConfirmed: true,
 			email: 'admin@q-wallet.com',
-			password: '01234dmin',
+			password: '01234Admin',
 		});
 		console.log(
 			'Admin user created..., email: admin@q-wallet.com, password: 01234Admin'

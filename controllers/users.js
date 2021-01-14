@@ -13,6 +13,15 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 	}
 
 	const user = await User.findOne({ email: req.body.email });
+
+	if (!user) {
+		return next(
+			new ErrorResponse(
+				`No user with the email ${req.body.email} found!`,
+				404
+			)
+		);
+	}
 	const mainWallet = await Wallet.findById(user.wallet);
 	const { name, email, role, _id, isEmailConfirmed } = user;
 	const data = {

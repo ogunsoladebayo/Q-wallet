@@ -1,5 +1,7 @@
 # Q-wallet
 flexible wallet system with international coverage...
+
+![Test](test/badge.svg)
 ## Technologies used
 > The Q-wallet is the backend API for a wallet system and is built on NodeJS and Express.
 >- The request processing flow in these terms: Signup request handling example:
