@@ -25,7 +25,7 @@ Rename "config.env.example" to "config.env" and update the values/settings to yo
 > docker-compose.yml file included in project's root folder.
 
 ## Demo
-The API is live at [Q-wallet API](https://q-wallet.tk)
+The API is live at [Q-wallet API](https://api.q-wallet.tk)
 
 Extensive documentation with examples [here](https://documenter.getpostman.com/view/11616904/TVzSjwg5)
 
