@@ -10,6 +10,7 @@ const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 // Route files
 const auth = require('./routes/auth');
@@ -57,6 +58,9 @@ app.use(
 		extended: false,
 	})
 );
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
 app.use('/v1/auth', auth);
