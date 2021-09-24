@@ -74,6 +74,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 	} catch (error) {
 		user.deleteOne();
 		wallet.deleteOne();
+		console.log(error);
 		return next(
 			new ErrorResponse(
 				'Could not send confirmation email, please register again'

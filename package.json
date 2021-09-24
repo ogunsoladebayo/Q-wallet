@@ -1,51 +1,51 @@
 {
-  "name": "q-wallet",
-  "version": "1.0.0",
-  "description": "flexible wallet system with international compatibility",
-  "main": "server.js",
-  "scripts": {
-    "dev": "nodemon server.js",
-    "start": "NODE_ENV=production node server.js",
-    "test": "mocha --exit",
-    "lint": "eslint Models/* Utils/* Routes/* Controllers/* server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ogunsoladebayo/Q-wallet.git"
-  },
-  "author": "Ogunsola Usman A.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ogunsoladebayo/Q-wallet/issues"
-  },
-  "homepage": "https://github.com/ogunsoladebayo/Q-wallet#readme",
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "eslint": "^7.17.0",
-    "mocha": "^8.2.1",
-    "mocha-badge-generator": "^0.9.0",
-    "morgan": "^1.10.0",
-    "nodemon": "^2.0.7"
-  },
-  "dependencies": {
-    "axios": "^0.21.1",
-    "bcryptjs": "^2.4.3",
-    "circular-json": "^0.5.9",
-    "colors": "^1.4.0",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "es6-template-strings": "^2.0.1",
-    "express": "^4.17.1",
-    "express-mongo-sanitize": "^2.0.2",
-    "express-rate-limit": "^5.2.3",
-    "helmet": "^4.3.1",
-    "hpp": "^0.2.3",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.11.11",
-    "nodemailer": "^6.4.17",
-    "nodemailer-mailgun-transport": "^2.0.2",
-    "xss-clean": "^0.1.1"
-  }
+	"name": "q-wallet",
+	"version": "1.0.0",
+	"description": "flexible wallet system with international compatibility",
+	"main": "server.js",
+	"scripts": {
+		"dev": "nodemon server.js",
+		"start": "NODE_ENV=production node server.js",
+		"test": "mocha --exit",
+		"lint": "eslint Models/* Utils/* Routes/* Controllers/* server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ogunsoladebayo/Q-wallet.git"
+	},
+	"author": "Ogunsola Usman A.",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/ogunsoladebayo/Q-wallet/issues"
+	},
+	"homepage": "https://github.com/ogunsoladebayo/Q-wallet#readme",
+	"devDependencies": {
+		"chai": "^4.2.0",
+		"chai-http": "^4.3.0",
+		"eslint": "^7.17.0",
+		"mocha": "^8.2.1",
+		"mocha-badge-generator": "^0.9.0",
+		"nodemon": "^2.0.7"
+	},
+	"dependencies": {
+		"axios": "^0.21.1",
+		"bcryptjs": "^2.4.3",
+		"circular-json": "^0.5.9",
+		"colors": "^1.4.0",
+		"cookie-parser": "^1.4.5",
+		"cors": "^2.8.5",
+		"dotenv": "^8.2.0",
+		"es6-template-strings": "^2.0.1",
+		"express": "^4.17.1",
+		"express-mongo-sanitize": "^2.0.2",
+		"express-rate-limit": "^5.2.3",
+		"helmet": "^4.3.1",
+		"hpp": "^0.2.3",
+		"jsonwebtoken": "^8.5.1",
+		"mongoose": "^5.11.11",
+		"nodemailer": "^6.4.17",
+		"morgan": "^1.10.0",
+		"nodemailer-mailgun-transport": "^2.0.2",
+		"xss-clean": "^0.1.1"
+	}
 }
