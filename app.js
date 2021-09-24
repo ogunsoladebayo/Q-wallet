@@ -35,7 +35,7 @@ app.use(xss());
 // Rate limiting
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000, // 10 mins
-	max: 100,
+	max: 100
 });
 app.use(limiter);
 
@@ -55,14 +55,17 @@ app.use(cors());
 app.use(express.json());
 app.use(
 	express.urlencoded({
-		extended: false,
+		extended: false
 	})
 );
 
 // Set static folder
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
+app.get('/', (req, res) => {
+	res.redirect(301, 'https://documenter.getpostman.com/view/11616904/TVzSjwg5');
+});
 app.use('/v1/auth', auth);
 app.use('/v1/users', users);
 app.use('/v1/transactions', transactions);

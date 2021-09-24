@@ -29,5 +29,5 @@ const server = app.listen(port, () => {
 	const address = server.address();
 	const bind = typeof host === 'string' ? `pipe ${address}` : `port: ${port}`;
 	// eslint-disable-next-line no-console
-	console.log(`Running in ${port} mode on ${bind}`.white.inverse);
+	console.log(`Running in ${process.env.NODE_ENV} mode on ${bind}`.white.inverse);
 });
