@@ -25,6 +25,7 @@ const normalizePort = (val) => {
 const port = normalizePort(process.env.NODE_ENV === 'production' ? process.env.PORT : '3000');
 
 // create a http server
+//
 const server = app.listen(port, () => {
 	const address = server.address();
 	const bind = typeof host === 'string' ? `pipe ${address}` : `port: ${port}`;
