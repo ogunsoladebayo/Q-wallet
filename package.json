@@ -45,7 +45,7 @@
 		"mongoose": "^6.13.5",
 		"nodemailer": "^6.9.9",
 		"morgan": "^1.10.0",
-		"nodemailer-mailgun-transport": "^2.0.2",
+		"nodemailer-mailgun-transport": "^2.1.5",
 		"xss-clean": "^0.1.1"
 	}
 }
