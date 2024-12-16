@@ -43,7 +43,7 @@
 		"hpp": "^0.2.3",
 		"jsonwebtoken": "^8.5.1",
 		"mongoose": "^6.13.5",
-		"nodemailer": "^6.4.17",
+		"nodemailer": "^6.9.9",
 		"morgan": "^1.10.0",
 		"nodemailer-mailgun-transport": "^2.0.2",
 		"xss-clean": "^0.1.1"
