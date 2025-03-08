@@ -28,7 +28,7 @@
 		"nodemon": "^2.0.22"
 	},
 	"dependencies": {
-		"axios": "^0.28.0",
+		"axios": "^1.8.2",
 		"bcryptjs": "^2.4.3",
 		"circular-json": "^0.5.9",
 		"colors": "^1.4.0",
